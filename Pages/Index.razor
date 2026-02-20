@@ -1,0 +1,256 @@
+@page "/"
+@inject SummaryOrchestrator Orchestrator
+@inject ILogger<Index> Logger
+
+<PageTitle>LogSummarizer - AI-Powered Log Analysis</PageTitle>
+
+<div class="container">
+    <h1>LogSummarizer</h1>
+    <p class="subtitle">AI-Powered .NET Application Log Analysis</p>
+
+    <div class="layout">
+        <!-- Left Card: Input Form -->
+        <div class="card">
+            <h2>Analysis Configuration</h2>
+
+            <div class="form-group">
+                <label for="service">Service Name</label>
+                <input id="service" type="text" @bind="_serviceName" placeholder="e.g., OrderService" class="input" />
+            </div>
+
+            <div class="form-group">
+                <label for="environment">Environment</label>
+                <input id="environment" type="text" @bind="_environment" placeholder="e.g., Production" class="input" />
+            </div>
+
+            <div class="form-group">
+                <label for="date">Date (YYYY-MM-DD)</label>
+                <input id="date" type="text" @bind="_date" placeholder="YYYY-MM-DD" class="input" />
+            </div>
+
+            <div class="form-group">
+                <label for="logsRoot">Logs Root (Optional)</label>
+                <input id="logsRoot" type="text" @bind="_logsRoot" placeholder="Default: logs/" class="input" />
+            </div>
+
+            <button @onclick="AnalyzeAsync" disabled="@_isBusy" class="btn-primary">
+                @(_isBusy ? "Analyzing..." : "Analyze Logs")
+            </button>
+
+            @if (!string.IsNullOrWhiteSpace(_statusMessage))
+            {
+                <div class="status @(_isError ? "error" : "info")">
+                    @_statusMessage
+                </div>
+            }
+
+            @if (_isBusy && _progress != null)
+            {
+                <div class="progress-container">
+                    <progress value="@_progress.Index" max="@_progress.Total"></progress>
+                    <span class="progress-text">@_progress.Stage</span>
+                </div>
+            }
+
+            @if (_estimatedTokens > 0)
+            {
+                <div class="token-estimate">
+                    Estimated tokens: ~@_estimatedTokens
+                </div>
+            }
+        </div>
+
+        <!-- Right Card: Results -->
+        @if (_result != null)
+        {
+            <div class="card results">
+                <h2>Analysis Results</h2>
+
+                <div class="section">
+                    <h3>Overview</h3>
+                    <p>@_result.Overview</p>
+                </div>
+
+                <div class="section">
+                    <h3>Key Performance Indicators</h3>
+                    <ul class="kpi-list">
+                        <li><strong>Total Lines:</strong> @_result.Kpis.TotalLines.ToString("N0")</li>
+                        <li><strong>Error Count:</strong> @_result.Kpis.ErrorCount.ToString("N0")</li>
+                        <li><strong>Warning Count:</strong> @_result.Kpis.WarnCount.ToString("N0")</li>
+                        <li><strong>Unique Error Types:</strong> @_result.Kpis.UniqueErrorTypes</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>Top Events</h3>
+                    @foreach (var evt in _result.TopEvents)
+                    {
+                        <details class="event-item">
+                            <summary>
+                                <strong>@evt.Type</strong> <span class="count-badge">@evt.Count</span>
+                            </summary>
+                            <div class="event-examples">
+                                @if (evt.Examples.Any())
+                                {
+                                    <p><em>Examples:</em></p>
+                                    <ul>
+                                        @foreach (var example in evt.Examples)
+                                        {
+                                            <li><code>@example</code></li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        </details>
+                    }
+                </div>
+
+                <div class="section">
+                    <h3>Root Causes</h3>
+                    @if (_result.RootCauses.Any())
+                    {
+                        <ul class="root-cause-list">
+                            @foreach (var cause in _result.RootCauses)
+                            {
+                                <li>
+                                    <strong>@cause.ErrorType:</strong> @cause.Hypothesis
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="muted">No root causes identified.</p>
+                    }
+                </div>
+
+                <div class="section">
+                    <h3>Recommended Actions</h3>
+                    @if (_result.Actions.Any())
+                    {
+                        <ol class="action-list">
+                            @foreach (var action in _result.Actions.OrderBy(a => GetPriorityOrder(a.Priority)))
+                            {
+                                <li>
+                                    <div class="action-header">
+                                        <span class="badge priority-@action.Priority.ToLower()">@action.Priority.ToUpper()</span>
+                                        <strong>@action.Title</strong>
+                                    </div>
+                                    <p><em>Why:</em> @action.Why</p>
+                                    @if (!string.IsNullOrWhiteSpace(action.OwnerHint))
+                                    {
+                                        <p><em>Owner Hint:</em> @action.OwnerHint</p>
+                                    }
+                                </li>
+                            }
+                        </ol>
+                    }
+                    else
+                    {
+                        <p class="muted">No actions required.</p>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private string _serviceName = "MyService";
+    private string _environment = "Production";
+    private string _date = DateTime.Today.ToString("yyyy-MM-dd");
+    private string? _logsRoot;
+
+    private bool _isBusy;
+    private string? _statusMessage;
+    private bool _isError;
+    private ProgressReport? _progress;
+    private AnalysisResult? _result;
+    private int _estimatedTokens;
+
+    private async Task AnalyzeAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_serviceName) || string.IsNullOrWhiteSpace(_environment) || string.IsNullOrWhiteSpace(_date))
+        {
+            _statusMessage = "Please fill in all required fields.";
+            _isError = true;
+            return;
+        }
+
+        _isBusy = true;
+        _statusMessage = null;
+        _isError = false;
+        _result = null;
+        _progress = null;
+        _estimatedTokens = 0;
+
+        try
+        {
+            await foreach (var (progress, result) in Orchestrator.RunAsync(_serviceName, _environment, _date, _logsRoot))
+            {
+                _progress = progress;
+
+                if (result != null)
+                {
+                    _result = result;
+                    _statusMessage = "Analysis complete!";
+                    _isError = false;
+                }
+
+                StateHasChanged();
+            }
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("API key"))
+        {
+            // Try fallback to summary.json
+            Logger.LogWarning("API key missing, attempting to load from summary.json");
+            _statusMessage = "API key not configured. Attempting to load cached summary...";
+            StateHasChanged();
+
+            try
+            {
+                var fallbackResult = await Orchestrator.LoadSummaryAsync(_date, _logsRoot);
+
+                if (fallbackResult != null)
+                {
+                    _result = fallbackResult;
+                    _statusMessage = "Loaded cached summary (API key not configured).";
+                    _isError = false;
+                }
+                else
+                {
+                    _statusMessage = "No cached summary found. Please configure OpenAI API key.";
+                    _isError = true;
+                }
+            }
+            catch (Exception fallbackEx)
+            {
+                Logger.LogError(fallbackEx, "Failed to load fallback summary");
+                _statusMessage = $"Error loading summary: {fallbackEx.Message}";
+                _isError = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Analysis failed");
+            _statusMessage = $"Error: {ex.Message}";
+            _isError = true;
+        }
+        finally
+        {
+            _isBusy = false;
+            StateHasChanged();
+        }
+    }
+
+    private int GetPriorityOrder(string priority)
+    {
+        return priority.ToLower() switch
+        {
+            "high" => 0,
+            "medium" => 1,
+            "low" => 2,
+            _ => 3
+        };
+    }
+}

@@ -1,0 +1,360 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+/* Container */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+h1 {
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.subtitle {
+    color: #f0f0f0;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+/* Layout */
+.layout {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Card */
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.card.results {
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.card h2 {
+    color: #667eea;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 0.5rem;
+}
+
+.card h3 {
+    color: #764ba2;
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    margin-top: 1rem;
+}
+
+/* Form */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* Button */
+.btn-primary {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 1rem;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Status */
+.status {
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.status.info {
+    background: #e3f2fd;
+    color: #1565c0;
+    border-left: 4px solid #1565c0;
+}
+
+.status.error {
+    background: #ffebee;
+    color: #c62828;
+    border-left: 4px solid #c62828;
+}
+
+/* Progress */
+.progress-container {
+    margin-top: 1rem;
+}
+
+progress {
+    width: 100%;
+    height: 24px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+progress::-webkit-progress-bar {
+    background-color: #f0f0f0;
+    border-radius: 12px;
+}
+
+progress::-webkit-progress-value {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+}
+
+progress::-moz-progress-bar {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+}
+
+.progress-text {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+    font-style: italic;
+}
+
+.token-estimate {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: #f9f9f9;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+}
+
+/* Results */
+.section {
+    margin-bottom: 2rem;
+}
+
+.kpi-list {
+    list-style: none;
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+.kpi-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.kpi-list li:last-child {
+    border-bottom: none;
+}
+
+/* Events */
+.event-item {
+    background: #f9f9f9;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.event-item:hover {
+    background: #f0f0f0;
+}
+
+.event-item summary {
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.count-badge {
+    background: #667eea;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+
+.event-examples {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.event-examples ul {
+    margin-left: 1.5rem;
+}
+
+.event-examples code {
+    background: #fff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+/* Root Causes */
+.root-cause-list {
+    list-style: none;
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+.root-cause-list li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.root-cause-list li:last-child {
+    border-bottom: none;
+}
+
+/* Actions */
+.action-list {
+    list-style: decimal;
+    margin-left: 1.5rem;
+}
+
+.action-list li {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 6px;
+}
+
+.action-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.badge.priority-high {
+    background: #ff5252;
+    color: white;
+}
+
+.badge.priority-medium {
+    background: #ffa726;
+    color: white;
+}
+
+.badge.priority-low {
+    background: #66bb6a;
+    color: white;
+}
+
+.action-list p {
+    margin: 0.5rem 0;
+    color: #555;
+    font-size: 0.95rem;
+}
+
+.muted {
+    color: #999;
+    font-style: italic;
+}
+
+/* Error UI */
+#blazor-error-ui {
+    background: #ffebee;
+    color: #c62828;
+    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#blazor-error-ui.show {
+    display: block;
+}
+
+#blazor-error-ui .reload {
+    color: #c62828;
+    text-decoration: underline;
+    margin-right: 1rem;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    font-weight: bold;
+}

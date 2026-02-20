@@ -1,0 +1,62 @@
+2025-10-02 07:59:58.101 [INFO] (Startup) Service 'Checkout' booting... CorrelationId=3f3a3b2a-0a1e-4b1c-8a6c-13c2a9a4f9c0
+2025-10-02 08:00:00.223 [INFO] (Config) Loaded 27 settings. Env=USQA FeatureFlags=[NewPricing=true, EmailV2=false]
+2025-10-02 08:00:01.447 [INFO] (DB) Connection established to OrdersDB at 10.24.6.17 PoolSize=50
+2025-10-02 08:00:02.019 [INFO] (Redis) Connected to cache redis.internal:6379
+2025-10-02 08:00:05.612 [INFO] (Auth) Service-to-service token acquired: Bearer eyJraWQiOiJkZ...abc123
+2025-10-02 08:00:06.032 [INFO] (HTTP) GET /health => 200 in 3ms
+2025-10-02 08:02:11.284 [INFO] (User) Login success user=alice.wong@example.com ip=198.51.100.72 CorrelationId=6c0f6d8e-1a9c-4bda-9a47-1b1c7d1b8df2
+2025-10-02 08:03:00.901 [WARN] (DB) Slow query: SELECT * FROM Inventory WHERE Sku IN (...) duration=2.9s
+2025-10-02 08:03:41.517 [INFO] (Cart) AddItem sku=SKU-10023 qty=1 user=alice.wong@example.com
+2025-10-02 08:03:43.220 [INFO] (Cart) AddItem sku=SKU-50288 qty=2 user=alice.wong@example.com
+2025-10-02 08:04:10.004 [WARN] (RateLimit) Approaching limit for /pricing API key=Bearer eyJhbGciOiJIUzI1NiJ9.limit-test
+2025-10-02 08:04:33.590 [ERROR] (Pricing) Upstream 429 Too Many Requests path=/v1/price/quote retryable=true CorrelationId=9b1a0b1a-8f42-4a7b-9c84-1a1b5f0ac7e0
+2025-10-02 08:04:33.591 [WARN] (Retry) Pricing quote failed (attempt 1/3) backoff=200ms
+2025-10-02 08:04:33.812 [WARN] (Retry) Pricing quote failed (attempt 2/3) backoff=400ms
+2025-10-02 08:04:34.215 [INFO] (Retry) Pricing quote succeeded on attempt=3 latency=712ms
+2025-10-02 08:05:10.778 [INFO] (Checkout) CreateOrder start OrderId=ORD-12001 Items=3 CorrelationId=b7f5e233-3df4-4b25-9b09-7a1f7d65b5c2
+2025-10-02 08:05:11.005 [INFO] (Payment) Charging card last4=4420 amount=129.99 currency=USD provider=Stripe
+2025-10-02 08:05:11.487 [ERROR] (Payment) Provider error 502 Bad Gateway requestId=req_8Zp2S6 payload={"orderId":"ORD-12001","amount":129.99}
+2025-10-02 08:05:11.488 [WARN] (Retry) Payment (ORD-12001) attempt 1/3 backoff=500ms
+2025-10-02 08:05:12.074 [WARN] (Retry) Payment (ORD-12001) attempt 2/3 backoff=1000ms
+2025-10-02 08:05:13.198 [INFO] (Payment) Charge succeeded on attempt=3 txnId=ch_1Q2rsT
+2025-10-02 08:05:14.032 [INFO] (Email) Queued order confirmation to alice.wong@example.com provider=SendGrid
+2025-10-02 08:06:22.400 [WARN] (Email) Latency high: 2.4s threshold=1.0s messageId=mg-88321
+2025-10-02 08:07:09.661 [ERROR] (Shipping) NullReferenceException while computing shipping for OrderId=ORD-12002
+Stack trace:
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at ShippingCalculator.Calculate(Address address) in /src/Services/ShippingCalculator.cs:line 64
+   at OrderProcessor.FinalizeAsync(Order order) in /src/Services/OrderProcessor.cs:line 212
+Order context: OrderId=ORD-12002 CustomerId=CUST-8811
+
+2025-10-02 08:08:40.014 [WARN] (Memory) High usage: 7.9 GB / 10 GB GC=Gen2 1.2s pause
+2025-10-02 08:09:05.337 [ERROR] (Inventory) Timeout contacting inventory-api.internal/api/stock sku=SKU-77701 timeoutMs=1500
+2025-10-02 08:09:05.338 [WARN] (CircuitBreaker) Inventory OPEN for 60s failures=5 threshold=5
+2025-10-02 08:09:05.339 [ERROR] (Checkout) Cannot confirm stock due to circuit OPEN OrderId=ORD-12003
+2025-10-02 08:09:06.112 [INFO] (Cache) Evicted 120 stale entries region=pricing:quotes
+2025-10-02 08:10:12.771 [ERROR] (DB) Connection lost: timeout server=10.24.6.17 database=OrdersDB pool=50/50
+2025-10-02 08:10:12.995 [ERROR] (DB) Reconnect failed (attempt 1/3) SocketException: Connection refused 10.24.6.17:1433
+2025-10-02 08:10:13.612 [ERROR] (DB) Reconnect failed (attempt 2/3) SocketException: Connection refused 10.24.6.17:1433
+2025-10-02 08:10:14.823 [INFO] (DB) Reconnected after 2.0s downtime
+2025-10-02 08:11:21.006 [INFO] (Auth) User impersonation started admin=jose.saenz@example.com target=svc-checkout
+2025-10-02 08:12:55.219 [WARN] (Disk) Low space on /var/lib/app free=11% threshold=15%
+2025-10-02 08:13:44.560 [ERROR] (Email) SmtpException: The SMTP server requires a secure connection
+   at System.Net.Mail.SmtpClient.Send(MailMessage message)
+   at EmailService.SendAsync(Order order, String recipient) in /src/Services/EmailService.cs:line 91
+Recipient=bob.miller@example.com OrderId=ORD-12004
+
+2025-10-02 08:14:30.004 [INFO] (Deploy) Rolling update started image=checkout:2.7.1 commit=7f9a1c2
+2025-10-02 08:14:45.511 [INFO] (Deploy) Instance ready pod=checkout-7dd879d59f-4kq6z
+2025-10-02 08:15:02.229 [INFO] (Health) Readiness OK 10/10 checks
+2025-10-02 08:16:18.773 [WARN] (Auth) Token near expiry for background job 'DailyReport' expiresIn=55s
+2025-10-02 08:16:19.031 [INFO] (Auth) Refreshed token: Bearer eyJraWQiOiJrZW...newtoken
+2025-10-02 08:17:40.349 [ERROR] (PDF) Rendering failure wkhtmltopdf exitCode=1 orderId=ORD-12005
+stderr: QXcbConnection: Could not connect to display
+2025-10-02 08:18:05.992 [INFO] (Queue) Enqueued retry for invoice pdf orderId=ORD-12005 delay=5m
+2025-10-02 08:19:12.204 [WARN] (API) Downstream /tax/v2 latency p95=1.8s p99=3.1s
+2025-10-02 08:20:44.883 [ERROR] (Auth) Unauthorized access to /admin/settings by user=guest@example.com ip=203.0.113.19
+2025-10-02 08:22:10.110 [INFO] (Metrics) CacheHitRate=89.2% OrdersProcessed=742 Errors=9 Warnings=14
+2025-10-02 08:25:00.000 [INFO] (Job) DailyReport completed duration=00:04:31 output=/var/reports/report-2025-10-02.json
+2025-10-02 08:28:42.671 [ERROR] (Webhook) Partner callback failed 400 path=/webhooks/order-shipped id=wh_7732 msg=\"signature mismatch\"
+2025-10-02 08:30:10.334 [WARN] (Pricing) Fallback to cached quote sku=SKU-10023 age=28s
+2025-10-02 08:32:59.517 [INFO] (Checkout) Order completed OrderId=ORD-12006 total=259.80 items=4 user=bob.miller@example.com
+2025-10-02 08:40:00.123 [INFO] (Hourly) Metrics: Orders=1,204 Errors=17 Warnings=23 AvgLatency=182ms

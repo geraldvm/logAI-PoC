@@ -1,0 +1,32 @@
+2025-10-01 08:03:45.012 [ERROR] Failed to process order #ORD-9876: Inventory service timeout
+Stack trace:
+System.TimeoutException: The operation has timed out.
+   at InventoryService.CheckStock(String productId)
+   at OrderProcessor.ValidateOrder(Order order)
+   at OrderController.ProcessOrder(OrderRequest request) in /src/Controllers/OrderController.cs:line 127
+
+2025-10-01 08:08:11.234 [ERROR] Payment gateway returned error 500: Internal Server Error
+Context: OrderId=ORD-9877, Amount=129.99, Currency=USD
+Response: {"error":"internal_server_error","message":"Unexpected error processing payment"}
+
+2025-10-01 08:12:45.901 [ERROR] NullReferenceException: Object reference not set to an instance of an object
+   at ShippingCalculator.CalculateShippingCost(Address address) in /src/Services/ShippingCalculator.cs:line 45
+   at OrderProcessor.FinalizeOrder(Order order) in /src/Services/OrderProcessor.cs:line 89
+   at OrderWorkflow.ExecuteAsync(OrderContext context) in /src/Workflows/OrderWorkflow.cs:line 156
+Order context: OrderId=ORD-9878, CustomerId=CUST-5432
+
+2025-10-01 08:18:44.456 [ERROR] Database connection lost: Connection timeout
+Server: 192.168.1.50
+Database: OrdersDB
+Connection pool exhausted: Active=50, Max=50
+
+2025-10-01 08:25:30.567 [ERROR] Failed to send order confirmation to customer@domain.com
+SmtpException: The SMTP server requires a secure connection or the client was not authenticated
+   at System.Net.Mail.SmtpClient.Send(MailMessage message)
+   at EmailService.SendOrderConfirmation(Order order, String recipient) in /src/Services/EmailService.cs:line 78
+
+2025-10-01 08:35:27.234 [ERROR] Max retries exceeded for Inventory service
+Endpoint: https://inventory-api.internal.company.com/api/v1/stock
+Attempts: 3
+Last error: System.Net.Http.HttpRequestException: Connection refused
+Service health check status: UNHEALTHY
