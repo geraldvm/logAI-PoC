@@ -21,7 +21,7 @@ A production-grade **.NET 8 Blazor Server** application that ingests application
 ### 1. Clone/Download the Project
 
 ```bash
-cd log-ai
+cd logAI-PoC
 ```
 
 ### 2. Configure OpenAI API Key

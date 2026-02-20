@@ -11,7 +11,7 @@ Before starting, ensure you have:
 - [ ] .NET 8 SDK installed
 - [ ] OpenAI API key (starts with `sk-`)
 - [ ] Terminal/Command Prompt open
-- [ ] Working directory set to `YOUR-PATH\LogAI-PoC`
+- [ ] Working directory set to `YOUR-PATH\logAI-PoC`
 
 ### Verify .NET Installation
 
